@@ -13,12 +13,12 @@ UPPER_RED = "upper_red"
 
 LOW_RED = "low_red"
 
-DEFAULT_COLOR_RANGES = {LOW_RED: {"hue": 300, "saturation": 59, "value": 20},
+DEFAULT_COLOR_RANGES = {LOW_RED: {"hue": 300, "saturation": 15, "value": 20},
                         UPPER_RED: {"hue": 360, "saturation": 100, "value": 100},
-                        LOW_BLUE: {"hue": 200, "saturation": 16, "value": 16},
+                        LOW_BLUE: {"hue": 200, "saturation": 50, "value": 16},
                         UPPER_BLUE: {"hue": 280, "saturation": 100, "value": 100},
-                        LOW_YELLOW: {"hue": 50, "saturation": 20, "value": 20},
-                        UPPER_YELLOW: {"hue": 64, "saturation": 100, "value": 100}}
+                        LOW_YELLOW: {"hue": 50, "saturation": 16, "value": 15},
+                        UPPER_YELLOW: {"hue": 90, "saturation": 100, "value": 100}}
 
 
 def hsv2rgb(h, s, v):

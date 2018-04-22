@@ -17,6 +17,9 @@ def hsv_to_opencv(color):
 camera_settings = camera_settings.CameraSettings()
 threading.Thread(target=camera_settings.init_ui).start()
 
+shapes = {'red': None, 'blue': None, 'yellow': None, 'none': 'No colour'}
+biggest_contour_areas = {'red': -1, 'blue': -1, 'yellow': -1}
+
 cap = cv2.VideoCapture(1)
 # TODO: Lower the frame rate to like 20
 while True:
@@ -35,35 +38,49 @@ while True:
 
         masks = {'red': cv2.inRange(hsv, lower_red, upper_red), 'blue': cv2.inRange(hsv, lower_blue, upper_blue),
                  'yellow': cv2.inRange(hsv, lower_yellow, upper_yellow)}
-        biggest_contour_areas = {'red': -1, 'blue': -1, 'yellow': -1}
-        results = {'red': None, 'blue': None, 'yellow': None, 'none': 'No colour'}
+
+        cv2.imshow('red', masks['red'])
+        cv2.imshow('blue', masks['blue'])
+        cv2.imshow('yellow', masks['yellow'])
+
         for key in masks.keys():
 
             mask = masks[key]
             res = cv2.bitwise_and(frame, frame, mask=mask)
-            cv2.imshow('res', res)  # for debugging
+            # cv2.imshow('res', res)  # for debugging
 
-            edge = cv2.Canny(res, 10, 20)
-            cv2.imshow('edge', edge)
+            # edge = cv2.Canny(res, 10, 20)
+            # cv2.imshow('edge', edge)  # for debugging
+
+            # gray = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+            # thresh = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY)[1]
+
+            # cv2.imshow('gray', gray)
+            # cv2.imshow('thresh', thresh)
 
             # find contours in the edged image
-            contours = cv2.findContours(edge, cv2.RETR_EXTERNAL,
+            contours = cv2.findContours(mask, cv2.RETR_EXTERNAL,
                                         cv2.CHAIN_APPROX_SIMPLE)
             contours = contours[0] if imutils.is_cv2() else contours[1]
 
             biggest_contour_area = -1
             biggest_contour = None
-            for c in contours:
+
+            if len(contours) != 0:
+
+                # find the biggest area
+                c = max(contours, key=cv2.contourArea)
+
                 # find the biggest contour for the colour
                 contour_area = cv2.contourArea(c)
-                if contour_area < 200:
-                    continue
+                # if contour_area < 200:
+                #     continue
 
                 if contour_area > biggest_contour_area:
                     biggest_contour_area = contour_area
                     biggest_contour = c
                     biggest_contour_areas[key] = biggest_contour_area
-                    results[key] = detect_shape(c)
+                    shapes[key] = detect_shape(c)
 
                 M = cv2.moments(c)
 
@@ -90,7 +107,9 @@ while True:
                 temp = area
                 final_key = key
 
-        print(final_key + ' ' + (results[final_key] if results[final_key] is not None else 'no shape'))
+        if shapes[final_key] is not None:
+            print(final_key + ' ' + shapes[final_key])
+
         cv2.imshow('cont', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
