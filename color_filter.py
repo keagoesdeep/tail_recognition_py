@@ -18,6 +18,7 @@ camera_settings = camera_settings.CameraSettings()
 threading.Thread(target=camera_settings.init_ui).start()
 
 shapes = {'red': None, 'blue': None, 'yellow': None, 'none': 'No colour'}
+colours = {'red': (0, 0, 255), 'blue': (255, 0, 0), 'yellow': (0, 255, 255)}
 biggest_contour_areas = {'red': -1, 'blue': -1, 'yellow': -1}
 
 cap = cv2.VideoCapture(1)
@@ -39,9 +40,9 @@ while True:
         masks = {'red': cv2.inRange(hsv, lower_red, upper_red), 'blue': cv2.inRange(hsv, lower_blue, upper_blue),
                  'yellow': cv2.inRange(hsv, lower_yellow, upper_yellow)}
 
-        cv2.imshow('red', masks['red'])
-        cv2.imshow('blue', masks['blue'])
-        cv2.imshow('yellow', masks['yellow'])
+        # cv2.imshow('red', masks['red'])
+        # cv2.imshow('blue', masks['blue'])
+        # cv2.imshow('yellow', masks['yellow'])
 
         for key in masks.keys():
 
@@ -108,8 +109,13 @@ while True:
                 final_key = key
 
         if shapes[final_key] is not None:
-            print(final_key + ' ' + shapes[final_key])
-
+            colour = colours[final_key]
+            if shapes[final_key] is 'rectangle':
+                verx = np.array([[10, 10], [150, 10], [150, 150], [10, 150]])
+                cv2.fillPoly(frame, [verx], colour, 1)
+            else:
+                verx = np.array([[160, 10], [10, 200], [310, 200]])
+                cv2.fillPoly(frame, [verx], colour, 1)
         cv2.imshow('cont', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
